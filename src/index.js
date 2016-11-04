@@ -8,10 +8,12 @@ const namePrefix = 'parse-server';
 
 let emitter = new events.EventEmitter();
 
-
-let options = {};
-options = GCPUtil.requiredOrFromEnvironment(options, 'projectId', 'GCP_PROJECT_ID');
-options = GCPUtil.requiredOrFromEnvironment(options, 'keyFilename', 'GCP_KEYFILE_PATH');
+/**
+ * In order to use gcp pub/sub module we must provide 2 env. variables 
+ * GCP_PROJECT_ID - the project id on GCP
+ * GCP_KEYFILE_PATH - path where the google service account key is located 
+ */
+let options = GCPUtil.createOptionsFromEnvironment();
 
 const pubsubClient = PubSub({
   projectId: options.projectId,
@@ -26,7 +28,8 @@ class Publisher {
 
   publish(channel, message) {
 
-    const topic = pubsubClient.topic(channel);
+    let topicName = `${namePrefix}-${channel}`;
+    const topic = pubsubClient.topic(topicName);
 
     topic.publish(message, (err, messageIds) => {
       if (err) {
@@ -44,7 +47,7 @@ class Subscriber extends events.EventEmitter {
 
   subscribe(channel) {
 
-    let topicName = `${namePrefix}-${channel}`;
+    let topicName = `${namePrefix}-${channel}`; 
     const topic = pubsubClient.topic(topicName);
 
     /**
@@ -58,10 +61,10 @@ class Subscriber extends events.EventEmitter {
           if (err) {
             return;
           }
-          this.createSubscription(topic,channel);
+          this._createSubscription(topic,channel);
         });
       } else {
-        this.createSubscription(topic,channel);
+        this._createSubscription(topic,channel);
       }
     });
   }
@@ -70,13 +73,12 @@ class Subscriber extends events.EventEmitter {
     // Here we should get all the subscriptions under the channel topic and unsubscribe them
   }
 
-  createSubscription(topic,channel) {
+  _createSubscription(topic,channel) {
 
     const subscriptionUUID = uuid.v1();
     var subscriptionName = `${namePrefix}-${channel}-${subscriptionUUID}`;
 
     topic.subscribe(subscriptionName, (err, subscription) => {
-      console.log('callback');
       if (err) {
         console.log(`Failed to create subscription ${err}`);
         return;
@@ -88,12 +90,12 @@ class Subscriber extends events.EventEmitter {
         if (message.ackId) {
           message.ack();
         }
-        this.emit('message', channel, message.data);
+        let topicName = `${namePrefix}-${channel}`;
+        this.emit('message', channel , message.data);
       });
     });
   }
 }
-
 
 function createPublisher() {
   return new Publisher(emitter);
