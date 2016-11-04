@@ -2,15 +2,16 @@ import events from 'events';
 import PubSub from '@google-cloud/pubsub';
 import path from 'path';
 import uuid from 'uuid';
-import {GCPUtil} from './util';
+import { GCPUtil } from './util';
 
+const namePrefix = 'parse-server';
 
 let emitter = new events.EventEmitter();
 
-let options = {};
-options = GCPUtil.requiredOrFromEnvironment(options,'projectId',process.env.GCP_PROJECT_ID);
-options = GCPUtil.requiredOrFromEnvironment(options,'keyFilename',process.env.GCP_KEYFILE_PATH);
 
+let options = {};
+options = GCPUtil.requiredOrFromEnvironment(options, 'projectId', 'GCP_PROJECT_ID');
+options = GCPUtil.requiredOrFromEnvironment(options, 'keyFilename', 'GCP_KEYFILE_PATH');
 
 const pubsubClient = PubSub({
   projectId: options.projectId,
@@ -42,33 +43,54 @@ class Subscriber extends events.EventEmitter {
   }
 
   subscribe(channel) {
-        
-    const topic = pubsubClient.topic(channel);
-    const uuid = uuid.v1(); 
 
-    // construct unique subscription name 
-    var subscriptionName = `parse-server-${channel}-${uuid}`;
+    let topicName = `${namePrefix}-${channel}`;
+    const topic = pubsubClient.topic(topicName);
 
-    // TODO: use promises
+    /**
+     * check if the topic that we want to create exist
+     * if the topic not exist create a new topic based on the channel name
+     * the topic name will be parse-server-{channel_name}
+     *  */
+    topic.exists((err, exists) => {
+      if (!exists && !err) {
+        topic.create((err, topic, apiResponse) => {
+          if (err) {
+            return;
+          }
+          this.createSubscription(topic,channel);
+        });
+      } else {
+        this.createSubscription(topic,channel);
+      }
+    });
+  }
+
+  unsubscribe(channel) {
+    // Here we should get all the subscriptions under the channel topic and unsubscribe them
+  }
+
+  createSubscription(topic,channel) {
+
+    const subscriptionUUID = uuid.v1();
+    var subscriptionName = `${namePrefix}-${channel}-${subscriptionUUID}`;
+
     topic.subscribe(subscriptionName, (err, subscription) => {
+      console.log('callback');
       if (err) {
+        console.log(`Failed to create subscription ${err}`);
         return;
       }
+
+      console.log(`Subscription ${subscription.name} created.`);
 
       subscription.on('message', (message) => {
         if (message.ackId) {
           message.ack();
         }
-
         this.emit('message', channel, message.data);
       });
-
-      console.log(`Subscription ${subscription.name} created.`);
     });
-  }
-
-  unsubscribe(channel) {  
-    // Here we should get all the subscriptions under the channel topic and unsubscribe them
   }
 }
 
