@@ -24,6 +24,15 @@ class Publisher {
 
   constructor(emitter) {
     this.emitter = emitter;
+
+    // process.on('SIGNINT',function(){
+    //   process.exit();
+    // });
+
+    // process.on('SIGTERM',function(){
+    //   process.exit();
+    // });
+
   }
 
   publish(channel, message) {
@@ -42,7 +51,10 @@ class Publisher {
 class Subscriber extends events.EventEmitter {
 
   constructor() {
-    super();
+    super();    
+    process.on('SIGNINT',function(){
+      process.exit();
+    });
   }
 
   subscribe(channel) {
@@ -60,7 +72,7 @@ class Subscriber extends events.EventEmitter {
         topic.create((err, topic, apiResponse) => {
           if (err) {
             return;
-          }
+          }          
           this._createSubscription(topic,channel);
         });
       } else {
