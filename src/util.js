@@ -9,10 +9,15 @@ class GCPUtil {
         return options
     }
 
+    static fromEnvironmentOrDefault(options, key, env, defaultValue) {
+        options[key] = options[key] || process.env[env] || defaultValue;
+        return options;
+    }
+
     static createOptionsFromEnvironment() {
         let options = {};
-        options = this.requiredOrFromEnvironment(options, 'projectId', 'GCP_PROJECT_ID');
-        options = this.requiredOrFromEnvironment(options, 'keyFilename', 'GCP_KEYFILE_PATH');
+        options = this.fromEnvironmentOrDefault(options, 'projectId', 'GCP_PROJECT_ID',undefined);
+        options = this.fromEnvironmentOrDefault(options, 'keyFilename', 'GCP_KEYFILE_PATH',undefined);
         return options;
     }
 }
