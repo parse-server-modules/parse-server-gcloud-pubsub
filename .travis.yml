@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+- '6.0'
+deploy:
+  provider: npm
+  api_key:
+    secure: UU/B5dK5/mTaTFaOjCI3CvTaGBGOakYkHK+SVCMFWDB4gEVaN7U2DBvd4j5lKzl6GMOip4OiJLI2syGAmdZRdgDRqrKJQKWMDYNOGPy5dlsymsMurPqnE9Agm6O0I5LDWJBaIM7H3rThJEUeg8jgNTKPIMy7qz8QStkroKcP026zbgJ8LPRG68vvx7wcCiySX2h4D/ggpM5zqFmC+hi5dSVxRKSGO4BJT6otPU4lqpUd2WMy+6FZdknfgv1dgbd/j2MhD6vFkWuJM49sHjH/Y7y2T1R9Q9lXHRYuCz0Vu7ymaAxz5rdiAzqrLsUgj6QDF3PyQUVGL+GMgIGph9VcRxRAim5VgilF2bxlVBTesB5iFnPQjSlpXOCBCAVKYIvL4uTIRNzXE/3o+VDyZsQtiTIDpqw5tDMkdRreoVaWm/4DHDzr3nsZZQS7yttf4ssuP3otFm7qaf59DrwJ8wfNVp0Dd0+LVez0UEYmdSIC4dGIUBcCvc9rkdYHoFhWHutYqLJHRRtuR+wtDB5qFXeC6kRbZNuecxNfxr3EXJVHu6q+Er55rhxkN9fb8B6cGDQ4XkVjk0sjbkYuM0SyfD/O/dmJExejDB4Q2N02m2Mlsm1lGuavftrby7xE2d0SbeFY+duZrgovc0jlPTqhytYPBECoWeE54731dQpQ+u3IJAM=
+  on:
+    tags: true
+    repo: parse-server-modules/parse-server-gcloud-pubsub

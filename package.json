@@ -1,15 +1,14 @@
 {
   "name": "parse-server-gcloud-pubsub",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "google cloud pub/sub adapter for parse-server",
   "main": "lib/index.js",
   "engines": {
-    "node" : ">=6"
+    "node": ">=6"
   },
   "files": [
     "lib/"
   ],
-  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/parse-server-modules/parse-server-gcloud-pubsub.git"
