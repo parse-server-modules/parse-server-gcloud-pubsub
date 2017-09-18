@@ -1,6 +1,6 @@
 {
   "name": "parse-server-gcloud-pubsub",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "google cloud pub/sub adapter for parse-server",
   "main": "lib/index.js",
   "engines": {
